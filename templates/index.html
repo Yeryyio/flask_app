@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Pedido de Café</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Formulario de Pedido de Café</h1>
+        
+        <div class="form-section">
+            <form id="order_form">
+                <label for="coffee_type">Tipo de Café:</label>
+                <select id="coffee_type" required>
+                    <option value="">Seleccione</option>
+                    <option value="Supremo 1KG">Supremo 1KG</option>
+                    <option value="Supremo 250G">Supremo 250G</option>
+                    <option value="Exclusivo 250G">Exclusivo 250G</option>
+                    <option value="Energico 250G">Energico 250G</option>
+                </select>
+
+                <label for="quantity">Cantidad:</label>
+                <input type="number" id="quantity" required>
+
+                <label for="date_time">Fecha y Hora:</label>
+                <input type="datetime-local" id="date_time" required>
+
+                <label for="location">Ubicación:</label>
+                <select id="location" required>
+                    <option value="">Seleccione</option>
+                    <option value="Aeropuerto">Aeropuerto</option>
+                    <option value="Los Laureles">Los Laureles</option>
+                    <option value="España">España</option>
+                    <option value="Mburucuya">Mburucuya</option>
+                    <option value="Del Lago">Del Lago</option>
+                </select>
+
+                <label for="reason">Razón:</label>
+                <select id="reason" required>
+                    <option value="">Seleccione</option>
+                    <option value="Para venta">Para venta</option>
+                    <option value="Para uso interno">Para uso interno</option>
+                </select>
+
+                <button type="button" onclick="addOrder()">Agregar Pedido</button>
+            </form>
+        </div>
+
+        <div class="table-section">
+            <h2>Pedidos Cargados</h2>
+            <table id="order_table">
+                <thead>
+                    <tr>
+                        <th>Tipo de Café</th>
+                        <th>Cantidad</th>
+                        <th>Fecha y Hora</th>
+                        <th>Ubicación</th>
+                        <th>Razón</th>
+                        <th>Acción</th> <!-- Columna para el botón de eliminar -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Orders will be added here -->
+                </tbody>
+            </table>
+        </div>
+
+        <button type="button" onclick="submitOrders()">Enviar Pedidos</button>
+    </div>
+
+    <script>
+        function addOrder() {
+            var coffeeType = document.getElementById('coffee_type').value;
+            var quantity = document.getElementById('quantity').value;
+            var dateTime = document.getElementById('date_time').value;
+            var location = document.getElementById('location').value;
+            var reason = document.getElementById('reason').value;
+
+            if (!coffeeType || !quantity || !dateTime || !location || !reason) {
+                alert('Por favor, complete todos los campos.');
+                return;
+            }
+
+            var table = document.getElementById('order_table').getElementsByTagName('tbody')[0];
+            var newRow = table.insertRow();
+            newRow.innerHTML = `
+                <td>${coffeeType}</td>
+                <td>${quantity}</td>
+                <td>${dateTime}</td>
+                <td>${location}</td>
+                <td>${reason}</td>
+                <td><button type="button" onclick="removeOrder(this)">Eliminar</button></td>
+            `;
+
+            // Clear form fields after adding the order
+            document.getElementById('order_form').reset();
+        }
+
+        function removeOrder(button) {
+            var row = button.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+        }
+
+        function submitOrders() {
+            var table = document.getElementById('order_table').getElementsByTagName('tbody')[0];
+            var rows = table.getElementsByTagName('tr');
+            if (rows.length === 0) {
+                alert('No hay pedidos para enviar.');
+                return;
+            }
+
+            var formData = [];
+            for (var i = 0; i < rows.length; i++) {
+                var cells = rows[i].getElementsByTagName('td');
+                formData.push({
+                    coffeeType: cells[0].textContent,
+                    quantity: cells[1].textContent,
+                    dateTime: cells[2].textContent,
+                    location: cells[3].textContent,
+                    reason: cells[4].textContent
+                });
+            }
+
+            fetch('/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            }).then(response => response.json())
+              .then(data => {
+                  alert(data.message);
+                  document.getElementById('order_table').getElementsByTagName('tbody')[0].innerHTML = '';
+              });
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
