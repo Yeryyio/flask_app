@@ -23,5 +23,4 @@ setuptools==71.1.0
 six==1.16.0
 tzdata==2024.1
 Werkzeug==3.0.3
-Flask==2.3.4
-Flask-Mail==0.9.2
+
