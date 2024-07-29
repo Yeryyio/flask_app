@@ -8,6 +8,7 @@
 </head>
 <body>
     <div class="container">
+        <img src="{{ url_for('static', filename='LOGO.png') }}" alt="Logo" class="logo">
         <h1>Formulario de Pedido de Café</h1>
         
         <div class="form-section">
@@ -128,11 +129,14 @@
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({ orders: formData })
             }).then(response => response.json())
               .then(data => {
                   alert(data.message);
                   document.getElementById('order_table').getElementsByTagName('tbody')[0].innerHTML = '';
+              }).catch(error => {
+                  console.error('Error:', error);
+                  alert('Error al enviar los pedidos.');
               });
         }
     </script>
