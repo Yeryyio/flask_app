@@ -11,7 +11,7 @@ app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_USERNAME'] = 'sergioriquelme328@gmail.com'
-app.config['MAIL_PASSWORD'] = 'teor ivor hfas guvt'  # O usa una contraseña de aplicación si tienes 2FA activado
+app.config['MAIL_PASSWORD'] = 'jdjk wzwh nxrm ldmk'  # O usa una contraseña de aplicación si tienes 2FA activado
 
 mail = Mail(app)
 
