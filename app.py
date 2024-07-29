@@ -31,6 +31,82 @@ def submit():
         # Guardar el DataFrame en un archivo Excel
         file_path = 'pedidos.xlsx'
         df.to_excel(file_path, index=False)
+        
+        # Verificar si el archivo fue creado
+        if not os.path.exists(file_path):
+            raise Exception("No se pudo crear el archivo Excel.")
+
+        # Configuración del mensaje de correo
+        msg = Message('Nuevos Pedidos de Café',
+                      sender='sergioriquelme328@gmail.com',
+                      recipients=['acardenas.alvica@gmail.com'])
+        msg.body = 'Se adjunta el archivo con los pedidos de café.'
+        
+        # Adjuntar el archivo Excel al mensaje
+        with open(file_path, 'rb') as fp:
+            msg.attach(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
+        
+        # Enviar el correo
+        mail.send(msg)
+        
+        # Eliminar el archivo después de enviarlo
+        os.remove(file_path)
+        
+        return {'message': 'Pedidos enviados correctamente'}
+    except Exception as e:
+        print("Error:", e)  # Mensaje de depuración para errores
+        return {'message': 'Error al enviar los pedidos'}, 500
+
+@app.route('/test_email', methods=['GET'])
+def test_email():
+    try:
+        msg = Message('Prueba de Correo',
+                      sender='sergioriquelme328@gmail.com',
+                      recipients=['acardenas.alvica@gmail.com'])
+        msg.body = 'Este es un mensaje de prueba.'
+        
+        mail.send(msg)
+        return {'message': 'Correo enviado correctamente'}
+    except Exception as e:
+        print("Error:", e)
+        return {'message': 'Error al enviar el correo'}, 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+'''from flask import Flask, render_template, request, redirect, url_for
+from flask_mail import Mail, Message
+import pandas as pd
+import os
+
+app = Flask(__name__)
+
+# Configuración de Flask-Mail para Gmail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_USERNAME'] = 'sergioriquelme328@gmail.com'
+app.config['MAIL_PASSWORD'] = 'teor ivor hfas guvt'  # O usa una contraseña de aplicación si tienes 2FA activado
+
+mail = Mail(app)
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/submit', methods=['POST'])
+def submit():
+    try:
+        orders = request.json['orders']
+        print("Received orders:", orders)  # Mensaje de depuración
+        
+        # Crear un DataFrame de Pandas con los pedidos
+        df = pd.DataFrame(orders)
+        
+        # Guardar el DataFrame en un archivo Excel
+        file_path = 'pedidos.xlsx'
+        df.to_excel(file_path, index=False)
 
         # Configuración del mensaje de correo
         msg = Message('Nuevos Pedidos de Café',
@@ -55,7 +131,7 @@ def submit():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
+'''
 
 '''
 from flask import Flask, render_template, request, jsonify
