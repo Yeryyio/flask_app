@@ -21,30 +21,41 @@ def index():
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    orders = request.json['orders']
-    df = pd.DataFrame(orders)
-    
-    # Guardar el DataFrame en un archivo Excel
-    file_path = 'pedidos.xlsx'
-    df.to_excel(file_path, index=False)
+    try:
+        orders = request.json['orders']
+        print("Received orders:", orders)  # Mensaje de depuración
+        
+        # Crear un DataFrame de Pandas con los pedidos
+        df = pd.DataFrame(orders)
+        
+        # Guardar el DataFrame en un archivo Excel
+        file_path = 'pedidos.xlsx'
+        df.to_excel(file_path, index=False)
 
-    # Enviar el archivo por correo
-    msg = Message('Nuevos Pedidos de Café',
-                  sender='sergioriquelme328@gmail.com',
-                  recipients=['acardenas.alvica@gmail.com'])
-    msg.body = 'Se adjunta el archivo con los pedidos de café.'
-    with app.open_resource(file_path) as fp:
-        msg.attach(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
-    
-    mail.send(msg)
-    
-    # Eliminar el archivo después de enviarlo
-    os.remove(file_path)
-    
-    return {'message': 'Pedidos enviados correctamente'}
+        # Configuración del mensaje de correo
+        msg = Message('Nuevos Pedidos de Café',
+                      sender='sergioriquelme328@gmail.com',
+                      recipients=['acardenas.alvica@gmail.com'])
+        msg.body = 'Se adjunta el archivo con los pedidos de café.'
+        
+        # Adjuntar el archivo Excel al mensaje
+        with app.open_resource(file_path) as fp:
+            msg.attach(file_path, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', fp.read())
+        
+        # Enviar el correo
+        mail.send(msg)
+        
+        # Eliminar el archivo después de enviarlo
+        os.remove(file_path)
+        
+        return {'message': 'Pedidos enviados correctamente'}
+    except Exception as e:
+        print("Error:", e)  # Mensaje de depuración para errores
+        return {'message': 'Error al enviar los pedidos'}, 500
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 '''
 from flask import Flask, render_template, request, jsonify
